@@ -28,3 +28,5 @@ def screenshot():
 
 def tap(x, y):
     adb("shell", "input", "tap", str(x), str(y))
+    
+
