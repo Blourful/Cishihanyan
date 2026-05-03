@@ -4,7 +4,7 @@ import numpy as np
 # =========================================================
 # ROI（开始按钮区域）
 # =========================================================
-START_ROI = {"start": (0.4067, 0.4988), "end": (0.5689, 0.5619)}
+START_ROI = {"start": (0.2789, 0.2556), "end": (0.4156, 0.3688)}
 
 
 def crop_roi(frame, roi):
@@ -18,7 +18,7 @@ def crop_roi(frame, roi):
     return frame[y1:y2, x1:x2], (x1, y1, x2, y2)
 
 
-def detect_start(frame, debug=False):
+def detect_jump(frame, debug=False):
 
     roi, box = crop_roi(frame, START_ROI)
 
@@ -33,9 +33,9 @@ def detect_start(frame, debug=False):
     edge_ratio = np.mean(edges > 0)
 
     score = contrast + edge_ratio * 100
-    is_start = 84 < score < 85
+    is_jump = 84 < score < 85
 
-    # is_start = contrast > params["contrast_thr"] and edge_ratio > params["edge_thr"]
+    #is_jump = contrast > params["contrast_thr"] and edge_ratio > params["edge_thr"]
     # ===== 可视化 =====
     if debug:
         show = frame.copy()
@@ -59,28 +59,31 @@ def detect_start(frame, debug=False):
 
         cv2.waitKey(1)
 
-    return is_start, score
+    return is_jump, score
 
 
 if __name__ == "__main__":
     import time
-    from adb_tool import screenshot
+    from adb_tool import screenshot, tap
 
     params = {"contrast_thr": 21.35, "edge_thr": 0.0731}
 
     while True:
         frame = screenshot()
 
-        ok, score = detect_start(frame, debug=True)
+        ok, score = detect_jump(frame, debug=False)
 
-        if ok:
-            print("👉 检测到 开始界面")
-            print("score:", score)
+        print(score)
+        if score<66 and score>52:
 
+            print("click")
+            print("👉 检测到 跳跃")
+            # print("score:", score)
+            tap(540, 540)
         # ===== 关闭窗口检测 =====
-        if cv2.getWindowProperty("debug_roi", cv2.WND_PROP_VISIBLE) < 1:
-            break
+        # if cv2.getWindowProperty("debug_roi", cv2.WND_PROP_VISIBLE) < 1:
+        #     break
 
-        time.sleep(0.1)
+        # time.sleep(0.01)
 
-    cv2.destroyAllWindows()
+    # cv2.destroyAllWindows()

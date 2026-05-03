@@ -15,7 +15,7 @@ def crop_roi(frame, roi):
     return frame[y1:y2, x1:x2], (x1, y1, x2, y2)
 
 
-def detect_restart(frame, params, debug=False):
+def detect_restart(frame, debug=False):
 
     roi, box = crop_roi(frame, RESTART_ROI)
 
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     while True:
         frame = screenshot()
 
-        ok, score = detect_restart(frame, params, debug=True)
+        ok, score = detect_restart(frame, debug=True)
 
         if ok:
             print("👉 检测到 再来一次界面")

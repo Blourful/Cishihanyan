@@ -4,21 +4,21 @@ import numpy as np
 # =========================================================
 # ROI（开始按钮区域）
 # =========================================================
-START_ROI = {"start": (0.4067, 0.4988), "end": (0.5689, 0.5619)}
+START_ROI = {"menu": (0.0067, 0.0688), "end": (0.9789, 0.9919)}
 
 
 def crop_roi(frame, roi):
     h, w = frame.shape[:2]
 
-    x1 = int(roi["start"][0] * w)
-    y1 = int(roi["start"][1] * h)
+    x1 = int(roi["menu"][0] * w)
+    y1 = int(roi["menu"][1] * h)
     x2 = int(roi["end"][0] * w)
     y2 = int(roi["end"][1] * h)
 
     return frame[y1:y2, x1:x2], (x1, y1, x2, y2)
 
 
-def detect_start(frame, debug=False):
+def detect_menu(frame,  debug=False):
 
     roi, box = crop_roi(frame, START_ROI)
 
@@ -33,9 +33,9 @@ def detect_start(frame, debug=False):
     edge_ratio = np.mean(edges > 0)
 
     score = contrast + edge_ratio * 100
-    is_start = 84 < score < 85
+    is_menu = 57 < score < 58
 
-    # is_start = contrast > params["contrast_thr"] and edge_ratio > params["edge_thr"]
+    # is_menu = contrast > params["contrast_thr"] and edge_ratio > params["edge_thr"]
     # ===== 可视化 =====
     if debug:
         show = frame.copy()
@@ -54,12 +54,12 @@ def detect_start(frame, debug=False):
             2,
         )
 
-        # cv2.imshow("debug_start", show)
+        # cv2.imshow("debug_menu", show)
         cv2.imshow("debug_roi", roi)
 
         cv2.waitKey(1)
 
-    return is_start, score
+    return is_menu, score
 
 
 if __name__ == "__main__":
@@ -71,10 +71,10 @@ if __name__ == "__main__":
     while True:
         frame = screenshot()
 
-        ok, score = detect_start(frame, debug=True)
+        ok, score = detect_menu(frame,  debug=True)
 
         if ok:
-            print("👉 检测到 开始界面")
+            print("👉 检测到 菜单界面")
             print("score:", score)
 
         # ===== 关闭窗口检测 =====
