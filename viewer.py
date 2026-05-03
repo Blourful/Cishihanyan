@@ -13,10 +13,13 @@ start_x, start_y = -1, -1
 end_x, end_y = -1, -1
 selecting = False
 
+# ===== 当前分辨率 =====
+frame_w, frame_h = 1, 1
+
 
 # ===== 点击 + ROI框选 =====
 def mouse_event(event, x, y, flags, param):
-    global start_x, start_y, end_x, end_y, selecting
+    global start_x, start_y, end_x, end_y, selecting, frame_w, frame_h
 
     real_x = int(x / SCALE)
     real_y = int(y / SCALE)
@@ -37,7 +40,22 @@ def mouse_event(event, x, y, flags, param):
         end_x, end_y = real_x, real_y
         selecting = False
 
-        print(f"[END] ({end_x},{end_y})")
+        # ===== 比例输出（新增）=====
+        sx_r = start_x / frame_w
+        sy_r = start_y / frame_h
+        ex_r = end_x / frame_w
+        ey_r = end_y / frame_h
+
+        print(f"""
+[ROI]
+pixel:
+  start: ({start_x}, {start_y})
+  end:   ({end_x}, {end_y})
+
+ratio:
+  start: ({sx_r:.4f}, {sy_r:.4f})
+  end:   ({ex_r:.4f}, {ey_r:.4f})
+""")
 
 
 # ===== 画点击点 =====
@@ -50,7 +68,7 @@ def draw_points(frame):
 
 # ===== 主循环 =====
 def run_viewer():
-    global start_x, start_y, end_x, end_y
+    global start_x, start_y, end_x, end_y, frame_w, frame_h
 
     cv2.namedWindow("debug", cv2.WINDOW_NORMAL)
 
@@ -69,6 +87,9 @@ def run_viewer():
             continue
 
         raw = frame.copy()
+
+        # ===== 更新分辨率（新增）=====
+        frame_h, frame_w = frame.shape[:2]
 
         # ===== 画ROI框 =====
         if start_x != -1 and end_x != -1:
@@ -108,7 +129,7 @@ def run_viewer():
         if cv2.getWindowProperty("debug", cv2.WND_PROP_VISIBLE) < 1:
             break
 
-        time.sleep(0.03)
+        time.sleep(0.03) 
 
     cv2.destroyAllWindows()
 
